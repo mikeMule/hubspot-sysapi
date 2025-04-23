@@ -1,6 +1,26 @@
 {
+  "configs": [
+    "hubspotapi-v1.xml"
+  ],
+  "secureProperties": [],
+  "supportedJavaVersions": [],
+  "redeploymentEnabled": true,
+  "name": "com.mycompany:hubspotapi-v1:1.0.0-SNAPSHOT",
   "minMuleVersion": "4.7.0",
-  "javaSpecificationVersions": [
-    "1.8"
-  ]
+  "requiredProduct": "MULE_EE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [],
+      "exportedResources": [
+        "application-types.xml",
+        "hubspotapi-v1.xml",
+        "log4j2.xml"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
 }

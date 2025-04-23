@@ -53,7 +53,7 @@ output application/json
     <!-- Make the HTTP Request -->
 		
 		<set-variable value='#["KEY"]' doc:name="Token" doc:id="eff7a3b2-16f0-4246-887f-40872d22c888" variableName="token" />
-		<set-variable value='#["KEY"]' doc:name="ApiKey" doc:id="842dab8c-64f5-4416-9473-a52f8854d5bf" variableName="APIKEY" />
+		<set-variable value='#["ADD API KEY"]' doc:name="ApiKey" doc:id="842dab8c-64f5-4416-9473-a52f8854d5bf" variableName="APIKEY" />
 		<!-- [STUDIO:"ap-huapi"]<http:request doc:id="e6971ed1-862e-452a-9a9d-3a6eb7748992" doc:name="ap-huapi" path="/crm/v3/objects/contacts" config-ref="hubapi" method="GET" target="HUBSPOTDATA">
       <http:body ><![CDATA[#[output application/json &#45;&#45;- payload&#93;&#93;&#93;></http:body>
 			<http:headers><![CDATA[#[{
@@ -61,7 +61,7 @@ output application/json
           "Content-Type": "application/json"
  }&#93;&#93;&#93;></http:headers>
     </http:request> [STUDIO] -->
-		 <http:request method="GET" doc:name="hubSpot-Data" doc:id="6758a05d-7113-462f-b722-d313b00cae48" config-ref="hubapi" path="/crm/v3/objects/contacts" target="HUBSPOTDATA">
+		 <http:request method="GET" doc:name="hubSpot-Data-req" doc:id="6758a05d-7113-462f-b722-d313b00cae48" config-ref="hubapi" path="/crm/v3/objects/contacts" target="HUBSPOTDATA">
 			<http:headers><![CDATA[#[{
           "Authorization": "Bearer " ++ vars.token,
           "Content-Type": "application/json"
