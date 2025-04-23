@@ -1,0 +1,321 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+      xmlns:http="http://www.mulesoft.org/schema/mule/http" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" 
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd  
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+  <!-- Listener Configuration -->
+  <http:listener-config name="Listener-config">
+    <http:listener-connection host="0.0.0.0" port="8081"/>
+  </http:listener-config>
+
+  <!-- Request Configuration -->
+
+  <!-- Main Flow -->
+  <http:request-config name="hubapi" doc:name="HTTP Request configuration" doc:id="fd927c44-f319-4487-bc59-d64f365f58e4" >
+		<http:request-connection protocol="HTTPS" host="api.hubapi.com" port="443"/>
+	</http:request-config>
+	<http:request-config name="higherlogic-HTTP-Req-Config" doc:name="HTTP Request configuration" doc:id="73058280-644f-490a-a84c-199dd1f037ef" >
+		<http:request-connection protocol="HTTPS" host="datapushapi.higherlogic.com" port="443"/>
+	</http:request-config>
+	<flow name="HigherLogic-api-FLOW" doc:id="2216c599-4ad3-4a2f-b83b-0b8cb4693b75" >
+		<http:listener doc:name="HigherLogic-api" doc:id="06658284-45a3-46fb-8df8-f587cc451fb1" config-ref="Listener-config" path="/HigherLogic"/>
+		<set-payload value='#["aa9567bd-3fa4-48b2-8a8f-0a485e5ee8f8"]' doc:name="APIKEY" doc:id="f2d59b0a-fec2-4f0b-b319-c105c839b491" />
+		<http:request method="POST" doc:name="higherlogic-api" doc:id="64734634-7bf5-4e18-82b0-5ee0bd5675dd" config-ref="higherlogic-HTTP-Req-Config" path="/v2/contactinfo" target="LogicData" >
+			<http:headers ><![CDATA[#[output application/json
+    ---
+    {
+      ApiKey: vars.APIKEY,
+      "Content-Type": "application/json"
+    }]]]></http:headers>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="c6135bee-4a9a-44f3-ab0d-05b82e4e8da3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"OutPut": vars.LogicData
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="Hubspot">
+    <!-- HTTP Listener -->
+    <http:listener config-ref="Listener-config" doc:id="6d34214f-7fce-4394-ac04-89a36443c4ab" doc:name="Listener" path="/contact"/>
+
+    <!-- Set Token Variable -->
+
+    <!-- Make the HTTP Request -->
+		<set-variable value="pat-na2-d6bedd64-70d7-41dc-9a54-da45bd1b6607" doc:name="Token" doc:id="eff7a3b2-16f0-4246-887f-40872d22c888" variableName="token" />
+		<set-variable value="aa9567bd-3fa4-48b2-8a8f-0a485e5ee8f8" doc:name="ApiKey" doc:id="842dab8c-64f5-4416-9473-a52f8854d5bf" variableName="APIKEY" />
+		<!-- [STUDIO:"ap-huapi"]<http:request doc:id="e6971ed1-862e-452a-9a9d-3a6eb7748992" doc:name="ap-huapi" path="/crm/v3/objects/contacts" config-ref="hubapi" method="GET" target="HUBSPOTDATA">
+      <http:body ><![CDATA[#[output application/json &#45;&#45;- payload&#93;&#93;&#93;></http:body>
+			<http:headers><![CDATA[#[{
+          "Authorization": "Bearer " ++ vars.token,
+          "Content-Type": "application/json"
+ }&#93;&#93;&#93;></http:headers>
+    </http:request> [STUDIO] -->
+		 <http:request method="GET" doc:name="hubSpot-Data" doc:id="6758a05d-7113-462f-b722-d313b00cae48" config-ref="hubapi" path="/crm/v3/objects/contacts" target="HUBSPOTDATA">
+			<http:headers><![CDATA[#[{
+          "Authorization": "Bearer " ++ vars.token,
+          "Content-Type": "application/json"
+ }]]]></http:headers>
+			<http:query-params><![CDATA[#[output application/java
+---
+{
+ "Key" : "Value",
+ "properties" : "email,firstname,lastname,jobtitle,company,industry,hs_role,hs_country_region_code,city,address,phone",
+ "limit": 100 as Number
+}]]]></http:query-params>
+		</http:request>
+		<!-- [STUDIO:"FilterData"]<ee:transform doc:name="FilterData" doc:id="575f8ef2-69a2-4d41-a5e2-c86c359b4652">
+			<ee:message>
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var HUbData = vars.HUBSPOTDATA
+&#45;&#45;-
+HUbData.results map ((item) -> item.properties)&#93;&#93;></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="HubDataResult"><![CDATA[%dw 2.0
+output application/json
+var HUbData = vars.HUBSPOTDATA
+&#45;&#45;-
+HUbData.results map ((item) -> item.properties)&#93;&#93;></ee:set-variable>
+			</ee:variables>
+		</ee:transform> [STUDIO] -->
+		<ee:transform doc:name="👉 Convert HubSpotData - 👉" doc:id="925f4eda-24d0-4815-b35e-45e4eddd72e2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var HubSpotData = vars.HUBSPOTDATA
+---
+// Ensure input is treated as an array
+(HubSpotData.results default []) map ((item) -> {
+   ContactDetails: {
+       ContactId: item.id,
+       FirstName: item.properties.firstname,
+       LastName: item.properties.lastname,
+       company: item.properties.company,
+       email: item.properties.email,
+       address: item.properties.address,
+       Job_role: item.properties.hs_role,
+       industry: item.properties.industry,
+       jobtitle: item.properties.jobtitle,
+       phone: item.properties.phone
+   },
+   "Demographics": [
+        {
+            "DemographicId": "Finance",
+            "DemographicValue": "Finance",
+            "DemographicTypeId": "AreaofPractice",
+            "DemographicTypeValue": "Area of Practice",
+            "DataType": "pick"
+        }
+   ]
+})]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="bc5c3b4f-dcf2-4cca-972c-24b3df16e726" message="#[output application/json --- payload]"/>
+		<http:request method="POST" doc:name="higherlogic-api" doc:id="d09056e4-df2c-40ee-92f1-25270afd04e8" config-ref="higherlogic-HTTP-Req-Config" target="LogicData" path="/v2/contactinfo">
+			<http:headers><![CDATA[#[output application/json
+            ---
+            {
+                "Content-Type": "application/json",
+                "ApiKey": "aa9567bd-3fa4-48b2-8a8f-0a485e5ee8f8"
+            }]]]></http:headers>
+		</http:request>
+
+    <!-- Transform the Response -->
+		<ee:transform doc:name="Transform Message" doc:id="91233628-0e47-4aac-9259-06947bc4618d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"result":  {
+	
+
+	"Msg": " Data Submitted ",
+
+	"HUbSpotData": vars.HUBSPOTDATA,
+	"HierLogicData": vars.LogicData
+
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+  
+</flow>
+	<flow name="hubspotapi-v1Flow" doc:id="f566efc5-9579-441e-a5cc-384560c9c0f5" >
+		 <!-- Send HTTP POST Request -->
+    <http:listener doc:name="HigherLogic-api" doc:id="97904094-0ac9-49b4-9310-8691b2c3653c" config-ref="Listener-config" path="/HigherLogic2" />
+		<!-- [STUDIO:"SampleData-PUSH"]<ee:transform doc:name="SampleData-PUSH" doc:id="a32bc5ec-ff83-476f-934d-6cfc3e6ae7b3" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="SampleData" ><![CDATA[[
+  {
+    "ContactDetails": {
+      "ContactId": "74cec42c-5e4d-e3bd-91ec-917d40a4c9dc",
+      "Age": 144,
+      "ContactType": "Non-Member",
+      "Birthday": "1908-02-21T12:37:20.258-05:00",
+      "MemberSince": "1995-09-02T06:50:06.829-04:00",
+      "MemberExpiresOn": "2022-12-31T17:20:11.441-05:00",
+      "Designation": "JD",
+      "PrimaryEmailAddress": "Drew96@gmail.com",
+      "Prefix": null,
+      "FirstName": "Drew",
+      "MiddleName": null,
+      "LastName": "Bernier",
+      "InformalName": null,
+      "Gender": "Male",
+      "Ethnicity": null,
+      "Suffix": "DDS",
+      "OrganizationName": "Ratke - Bogan",
+      "Title": "Internal Paradigm Officer",
+      "ParentContactId": "51272db8-3976-28f5-3138-622767b54c18",
+      "PrimaryContactContactId": null,
+      "ExcludeFromDirectory": false,
+      "DoNotEmail": true,
+      "IsMember": false,
+      "IsOrganization": false,
+      "AlternativeContactId": "6641329",
+      "Bio": "AGP",
+      "WebsiteURL": "http://ashtyn.net",
+      "ProfileImageURL": null,
+      "FacebookURL": null,
+      "TwitterURL": null,
+      "LinkedinURL": null,
+      "BloggerURL": null,
+      "OtherSocialURL": null,
+      "IsDeleted": false
+    },
+    "Groups": [
+      {
+        "InitialJoinDate": "2015-04-19T12:25:50.537-04:00",
+        "BeginDate": "2016-06-01T00:17:25.172-04:00",
+        "EndDate": "2021-01-19T11:48:15.324-05:00",
+        "GroupId": "d76cac90-1156-e9ae-45c5-635832cba28d",
+        "GroupName": "Investor Matrix Indigo",
+        "GroupType": "Chapter",
+        "GroupSubType": null,
+        "Role": "Chair"
+      }
+    &#93;,
+    "Demographics": [
+      {
+        "DemographicId": "Monday",
+        "DemographicValue": "Monday",
+        "DemographicTypeId": "Favorite_Weekday",
+        "DemographicTypeValue": "Favorite Weekday",
+        "DataType": "pick"
+      }
+    &#93;,
+    "Education": [
+      {
+        "SchoolName": "Tennessee University",
+        "City": "Lake Hattie",
+        "State": "Tennessee",
+        "Country": "United States",
+        "FromYear": 2008,
+        "ToYear": 2012,
+        "DegreeYear": 2012,
+        "IsHighestDegreeAttained": true,
+        "Degree": "General Studies",
+        "FieldOfStudy": "History",
+        "Advisor": "Professor Carlee Hauck",
+        "Dissertation": "Not applicable"
+      }
+    &#93;,
+    "JobHistory": [
+      {
+        "CompanyName": "O'Conner, Wuckert and Walsh",
+        "CompanyId": "2bfe2f9d-e34d-fc9e-50f7-b6e3f5052c78",
+        "Title": "CEO",
+        "City": "Botsfordmouth",
+        "State": "North Dakota",
+        "Country": "United States",
+        "StartDate": "2016-01-01T00:00:00.000-05:00",
+        "EndDate": "2020-01-01T00:00:00.000-05:00",
+        "IsPresent": true,
+        "WebsiteURL": "oconnerwuckertandwalsh.com"
+      }
+    &#93;,
+    "Addresses": [
+      {
+        "AddressName": "Current Address",
+        "AddressLine1": "445 Kassulke Glen",
+        "AddressLine2": "Suite 372",
+        "AddressLine3": null,
+        "City": "Isaiasview",
+        "StateProvince": "Georgia",
+        "PostalCode": "12345-6789",
+        "CountryCode": "KR",
+        "AddressType": "Main",
+        "Latitude": 51.5702,
+        "Longitude": 46.5946,
+        "DoNotPublish": true,
+        "IsBill": false,
+        "IsShip": true,
+        "IsMail": false,
+        "IsPrimary": true
+      }
+    &#93;,
+    "PhoneNumbers": [
+      {
+        "FormattedNumber": "655-313-6133",
+        "PhoneType": "Main Phone",
+        "IsPreferred": false,
+        "IsSmsPreferred": true,
+        "DoNotPublish": false
+      }
+    &#93;,
+    "EmailAddresses": [
+      {
+        "EmailAddress": "Norbert_Witting27@hotmail.com",
+        "EmailType": "Primary Email",
+        "IsPreferred": true,
+        "DoNotPublish": true
+      }
+    &#93;,
+    "Orders": [
+      {
+        "OrderId": "d90f6a4e-5fb5-faee-5ffa-2e8a993594e2",
+        "ProductId": "4301b40d-c0af-6341-018e-7d596d971e20",
+        "ProductQuantity": 65,
+        "ProductName": "Unbranded Wooden Chair",
+        "ProductType": "Chairs",
+        "ProductPrice": "398.09",
+        "OrderDate": "2020-02-08T23:44:00.128-05:00"
+      }
+    &#93;
+  }
+  &#93;&#93;&#93;></ee:set-variable>
+			</ee:variables>
+		</ee:transform> [STUDIO] -->
+		<set-variable value="pat-na1-c6a9c220-ea7b-46d1-bca4-4f5350df2b6b" doc:name="Token" doc:id="01dd6101-2894-4d83-addf-5b58ce3a0a30" variableName="token" />
+		<http:request method="GET" doc:name="hubSpot-Data" config-ref="hubapi" path="/crm/v3/objects/contacts">
+			<http:headers><![CDATA[#[{
+          "Authorization": "Bearer " ++ vars.token,
+          "Content-Type": "application/json"
+ }]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+ "Key" : "Value",
+ "properties" : "email,firstname,lastname,jobtitle,company,industry,hs_role,hs_country_region_code,city,address,phone"
+}]]]></http:query-params>
+        
+    
+</http:request>
+
+
+    <logger level="INFO" doc:name="Log API Response" message="API Response: #[payload]"/>
+	</flow>
+
+</mule>
