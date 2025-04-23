@@ -24,7 +24,7 @@
 	</http:request-config>
 	<flow name="HigherLogic-api-FLOW" doc:id="2216c599-4ad3-4a2f-b83b-0b8cb4693b75" >
 		<http:listener doc:name="HigherLogic-api" doc:id="06658284-45a3-46fb-8df8-f587cc451fb1" config-ref="Listener-config" path="/HigherLogic"/>
-		<set-payload value='#["aa9567bd-3fa4-48b2-8a8f-0a485e5ee8f8"]' doc:name="APIKEY" doc:id="f2d59b0a-fec2-4f0b-b319-c105c839b491" />
+		<set-payload value='#["ADD-YOUR-KEY"]' doc:name="APIKEY" doc:id="f2d59b0a-fec2-4f0b-b319-c105c839b491" />
 		<http:request method="POST" doc:name="higherlogic-api" doc:id="64734634-7bf5-4e18-82b0-5ee0bd5675dd" config-ref="higherlogic-HTTP-Req-Config" path="/v2/contactinfo" target="LogicData" >
 			<http:headers ><![CDATA[#[output application/json
     ---
@@ -51,8 +51,9 @@ output application/json
     <!-- Set Token Variable -->
 
     <!-- Make the HTTP Request -->
-		<set-variable value="pat-na2-d6bedd64-70d7-41dc-9a54-da45bd1b6607" doc:name="Token" doc:id="eff7a3b2-16f0-4246-887f-40872d22c888" variableName="token" />
-		<set-variable value="aa9567bd-3fa4-48b2-8a8f-0a485e5ee8f8" doc:name="ApiKey" doc:id="842dab8c-64f5-4416-9473-a52f8854d5bf" variableName="APIKEY" />
+		
+		<set-variable value='#["KEY"]' doc:name="Token" doc:id="eff7a3b2-16f0-4246-887f-40872d22c888" variableName="token" />
+		<set-variable value='#["KEY"]' doc:name="ApiKey" doc:id="842dab8c-64f5-4416-9473-a52f8854d5bf" variableName="APIKEY" />
 		<!-- [STUDIO:"ap-huapi"]<http:request doc:id="e6971ed1-862e-452a-9a9d-3a6eb7748992" doc:name="ap-huapi" path="/crm/v3/objects/contacts" config-ref="hubapi" method="GET" target="HUBSPOTDATA">
       <http:body ><![CDATA[#[output application/json &#45;&#45;- payload&#93;&#93;&#93;></http:body>
 			<http:headers><![CDATA[#[{
@@ -108,16 +109,7 @@ var HubSpotData = vars.HUBSPOTDATA
        industry: item.properties.industry,
        jobtitle: item.properties.jobtitle,
        phone: item.properties.phone
-   },
-   "Demographics": [
-        {
-            "DemographicId": "Finance",
-            "DemographicValue": "Finance",
-            "DemographicTypeId": "AreaofPractice",
-            "DemographicTypeValue": "Area of Practice",
-            "DataType": "pick"
-        }
-   ]
+   }
 })]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
@@ -127,7 +119,7 @@ var HubSpotData = vars.HUBSPOTDATA
             ---
             {
                 "Content-Type": "application/json",
-                "ApiKey": "aa9567bd-3fa4-48b2-8a8f-0a485e5ee8f8"
+                "ApiKey": "<<<USE-YOUR-KEY>>"
             }]]]></http:headers>
 		</http:request>
 
@@ -150,172 +142,27 @@ output application/json
 		</ee:transform>
   
 </flow>
-	<flow name="hubspotapi-v1Flow" doc:id="f566efc5-9579-441e-a5cc-384560c9c0f5" >
-		 <!-- Send HTTP POST Request -->
+	<!-- [STUDIO:"hubspotapi-v1"]<flow name="hubspotapi-v1" doc:id="f566efc5-9579-441e-a5cc-384560c9c0f5" >
+		 <!&#45;&#45; Send HTTP POST Request &#45;&#45;>
     <http:listener doc:name="HigherLogic-api" doc:id="97904094-0ac9-49b4-9310-8691b2c3653c" config-ref="Listener-config" path="/HigherLogic2" />
-		<!-- [STUDIO:"SampleData-PUSH"]<ee:transform doc:name="SampleData-PUSH" doc:id="a32bc5ec-ff83-476f-934d-6cfc3e6ae7b3" >
-			<ee:message >
-			</ee:message>
-			<ee:variables >
-				<ee:set-variable variableName="SampleData" ><![CDATA[[
-  {
-    "ContactDetails": {
-      "ContactId": "74cec42c-5e4d-e3bd-91ec-917d40a4c9dc",
-      "Age": 144,
-      "ContactType": "Non-Member",
-      "Birthday": "1908-02-21T12:37:20.258-05:00",
-      "MemberSince": "1995-09-02T06:50:06.829-04:00",
-      "MemberExpiresOn": "2022-12-31T17:20:11.441-05:00",
-      "Designation": "JD",
-      "PrimaryEmailAddress": "Drew96@gmail.com",
-      "Prefix": null,
-      "FirstName": "Drew",
-      "MiddleName": null,
-      "LastName": "Bernier",
-      "InformalName": null,
-      "Gender": "Male",
-      "Ethnicity": null,
-      "Suffix": "DDS",
-      "OrganizationName": "Ratke - Bogan",
-      "Title": "Internal Paradigm Officer",
-      "ParentContactId": "51272db8-3976-28f5-3138-622767b54c18",
-      "PrimaryContactContactId": null,
-      "ExcludeFromDirectory": false,
-      "DoNotEmail": true,
-      "IsMember": false,
-      "IsOrganization": false,
-      "AlternativeContactId": "6641329",
-      "Bio": "AGP",
-      "WebsiteURL": "http://ashtyn.net",
-      "ProfileImageURL": null,
-      "FacebookURL": null,
-      "TwitterURL": null,
-      "LinkedinURL": null,
-      "BloggerURL": null,
-      "OtherSocialURL": null,
-      "IsDeleted": false
-    },
-    "Groups": [
-      {
-        "InitialJoinDate": "2015-04-19T12:25:50.537-04:00",
-        "BeginDate": "2016-06-01T00:17:25.172-04:00",
-        "EndDate": "2021-01-19T11:48:15.324-05:00",
-        "GroupId": "d76cac90-1156-e9ae-45c5-635832cba28d",
-        "GroupName": "Investor Matrix Indigo",
-        "GroupType": "Chapter",
-        "GroupSubType": null,
-        "Role": "Chair"
-      }
-    &#93;,
-    "Demographics": [
-      {
-        "DemographicId": "Monday",
-        "DemographicValue": "Monday",
-        "DemographicTypeId": "Favorite_Weekday",
-        "DemographicTypeValue": "Favorite Weekday",
-        "DataType": "pick"
-      }
-    &#93;,
-    "Education": [
-      {
-        "SchoolName": "Tennessee University",
-        "City": "Lake Hattie",
-        "State": "Tennessee",
-        "Country": "United States",
-        "FromYear": 2008,
-        "ToYear": 2012,
-        "DegreeYear": 2012,
-        "IsHighestDegreeAttained": true,
-        "Degree": "General Studies",
-        "FieldOfStudy": "History",
-        "Advisor": "Professor Carlee Hauck",
-        "Dissertation": "Not applicable"
-      }
-    &#93;,
-    "JobHistory": [
-      {
-        "CompanyName": "O'Conner, Wuckert and Walsh",
-        "CompanyId": "2bfe2f9d-e34d-fc9e-50f7-b6e3f5052c78",
-        "Title": "CEO",
-        "City": "Botsfordmouth",
-        "State": "North Dakota",
-        "Country": "United States",
-        "StartDate": "2016-01-01T00:00:00.000-05:00",
-        "EndDate": "2020-01-01T00:00:00.000-05:00",
-        "IsPresent": true,
-        "WebsiteURL": "oconnerwuckertandwalsh.com"
-      }
-    &#93;,
-    "Addresses": [
-      {
-        "AddressName": "Current Address",
-        "AddressLine1": "445 Kassulke Glen",
-        "AddressLine2": "Suite 372",
-        "AddressLine3": null,
-        "City": "Isaiasview",
-        "StateProvince": "Georgia",
-        "PostalCode": "12345-6789",
-        "CountryCode": "KR",
-        "AddressType": "Main",
-        "Latitude": 51.5702,
-        "Longitude": 46.5946,
-        "DoNotPublish": true,
-        "IsBill": false,
-        "IsShip": true,
-        "IsMail": false,
-        "IsPrimary": true
-      }
-    &#93;,
-    "PhoneNumbers": [
-      {
-        "FormattedNumber": "655-313-6133",
-        "PhoneType": "Main Phone",
-        "IsPreferred": false,
-        "IsSmsPreferred": true,
-        "DoNotPublish": false
-      }
-    &#93;,
-    "EmailAddresses": [
-      {
-        "EmailAddress": "Norbert_Witting27@hotmail.com",
-        "EmailType": "Primary Email",
-        "IsPreferred": true,
-        "DoNotPublish": true
-      }
-    &#93;,
-    "Orders": [
-      {
-        "OrderId": "d90f6a4e-5fb5-faee-5ffa-2e8a993594e2",
-        "ProductId": "4301b40d-c0af-6341-018e-7d596d971e20",
-        "ProductQuantity": 65,
-        "ProductName": "Unbranded Wooden Chair",
-        "ProductType": "Chairs",
-        "ProductPrice": "398.09",
-        "OrderDate": "2020-02-08T23:44:00.128-05:00"
-      }
-    &#93;
-  }
-  &#93;&#93;&#93;></ee:set-variable>
-			</ee:variables>
-		</ee:transform> [STUDIO] -->
-		<set-variable value="pat-na1-c6a9c220-ea7b-46d1-bca4-4f5350df2b6b" doc:name="Token" doc:id="01dd6101-2894-4d83-addf-5b58ce3a0a30" variableName="token" />
+		<set-variable value="<<<USE-YOUR-KEY>>" doc:name="Token" doc:id="01dd6101-2894-4d83-addf-5b58ce3a0a30" variableName="token" />
 		<http:request method="GET" doc:name="hubSpot-Data" config-ref="hubapi" path="/crm/v3/objects/contacts">
 			<http:headers><![CDATA[#[{
           "Authorization": "Bearer " ++ vars.token,
           "Content-Type": "application/json"
- }]]]></http:headers>
+ }&#93;&#93;&#93;></http:headers>
 			<http:query-params ><![CDATA[#[output application/java
----
+&#45;&#45;-
 {
  "Key" : "Value",
  "properties" : "email,firstname,lastname,jobtitle,company,industry,hs_role,hs_country_region_code,city,address,phone"
-}]]]></http:query-params>
+}&#93;&#93;&#93;></http:query-params>
         
     
 </http:request>
 
 
-    <logger level="INFO" doc:name="Log API Response" message="API Response: #[payload]"/>
-	</flow>
+    <logger level="INFO" doc:name="Log API Response" message="API Response: #[payload&#93;"/>
+	</flow> [STUDIO] -->
 
 </mule>

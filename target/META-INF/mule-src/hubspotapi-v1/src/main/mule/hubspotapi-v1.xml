@@ -24,7 +24,7 @@
 	</http:request-config>
 	<flow name="HigherLogic-api-FLOW" doc:id="2216c599-4ad3-4a2f-b83b-0b8cb4693b75" >
 		<http:listener doc:name="HigherLogic-api" doc:id="06658284-45a3-46fb-8df8-f587cc451fb1" config-ref="Listener-config" path="/HigherLogic"/>
-		<set-payload value='#["aa9567bd-3fa4-48b2-8a8f-0a485e5ee8f8"]' doc:name="APIKEY" doc:id="f2d59b0a-fec2-4f0b-b319-c105c839b491" />
+		<set-payload value='#["ADD-YOUR-KEY"]' doc:name="APIKEY" doc:id="f2d59b0a-fec2-4f0b-b319-c105c839b491" />
 		<http:request method="POST" doc:name="higherlogic-api" doc:id="64734634-7bf5-4e18-82b0-5ee0bd5675dd" config-ref="higherlogic-HTTP-Req-Config" path="/v2/contactinfo" target="LogicData" >
 			<http:headers ><![CDATA[#[output application/json
     ---
@@ -51,8 +51,9 @@ output application/json
     <!-- Set Token Variable -->
 
     <!-- Make the HTTP Request -->
-		<set-variable value="pat-na2-d6bedd64-70d7-41dc-9a54-da45bd1b6607" doc:name="Token" doc:id="eff7a3b2-16f0-4246-887f-40872d22c888" variableName="token" />
-		<set-variable value="aa9567bd-3fa4-48b2-8a8f-0a485e5ee8f8" doc:name="ApiKey" doc:id="842dab8c-64f5-4416-9473-a52f8854d5bf" variableName="APIKEY" />
+		
+		<set-variable value='#["KEY"]' doc:name="Token" doc:id="eff7a3b2-16f0-4246-887f-40872d22c888" variableName="token" />
+		<set-variable value='#["KEY"]' doc:name="ApiKey" doc:id="842dab8c-64f5-4416-9473-a52f8854d5bf" variableName="APIKEY" />
 		<!-- [STUDIO:"ap-huapi"]<http:request doc:id="e6971ed1-862e-452a-9a9d-3a6eb7748992" doc:name="ap-huapi" path="/crm/v3/objects/contacts" config-ref="hubapi" method="GET" target="HUBSPOTDATA">
       <http:body ><![CDATA[#[output application/json &#45;&#45;- payload&#93;&#93;&#93;></http:body>
 			<http:headers><![CDATA[#[{
@@ -127,7 +128,7 @@ var HubSpotData = vars.HUBSPOTDATA
             ---
             {
                 "Content-Type": "application/json",
-                "ApiKey": "aa9567bd-3fa4-48b2-8a8f-0a485e5ee8f8"
+                "ApiKey": "<<<USE-YOUR-KEY>>"
             }]]]></http:headers>
 		</http:request>
 
@@ -150,7 +151,7 @@ output application/json
 		</ee:transform>
   
 </flow>
-	<flow name="hubspotapi-v1Flow" doc:id="f566efc5-9579-441e-a5cc-384560c9c0f5" >
+	<flow name="hubspotapi-v1" doc:id="f566efc5-9579-441e-a5cc-384560c9c0f5" >
 		 <!-- Send HTTP POST Request -->
     <http:listener doc:name="HigherLogic-api" doc:id="97904094-0ac9-49b4-9310-8691b2c3653c" config-ref="Listener-config" path="/HigherLogic2" />
 		<!-- [STUDIO:"SampleData-PUSH"]<ee:transform doc:name="SampleData-PUSH" doc:id="a32bc5ec-ff83-476f-934d-6cfc3e6ae7b3" >
@@ -298,7 +299,7 @@ output application/json
   &#93;&#93;&#93;></ee:set-variable>
 			</ee:variables>
 		</ee:transform> [STUDIO] -->
-		<set-variable value="pat-na1-c6a9c220-ea7b-46d1-bca4-4f5350df2b6b" doc:name="Token" doc:id="01dd6101-2894-4d83-addf-5b58ce3a0a30" variableName="token" />
+		<set-variable value="<<<USE-YOUR-KEY>>" doc:name="Token" doc:id="01dd6101-2894-4d83-addf-5b58ce3a0a30" variableName="token" />
 		<http:request method="GET" doc:name="hubSpot-Data" config-ref="hubapi" path="/crm/v3/objects/contacts">
 			<http:headers><![CDATA[#[{
           "Authorization": "Bearer " ++ vars.token,
